@@ -42,7 +42,7 @@ class Users(Resource):
 					}
 				}
 				return response_object, 200
-		except ValueError:
+		except exc.DataError:
 			return response_object, 404
 		
 
@@ -72,6 +72,17 @@ class UsersList(Resource):
 		except exc.IntegrityError:
 			db.session.rollback()
 			return response_object, 400
+
+	def get(self):
+		"""Get all users"""
+		response_object = {
+			'status': 'success',
+			'data' : {
+				'users': [user.to_json() for user in User.query.all()]
+			}
+		}
+
+		return response_object, 200
 
 
 		
