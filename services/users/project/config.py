@@ -2,6 +2,7 @@
 
 import os
 
+
 class BaseConfig:
 	"""Base Configuration"""
 	TESTING = False
