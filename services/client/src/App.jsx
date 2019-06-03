@@ -3,6 +3,8 @@ import axios from 'axios';
 import UsersList from './components/UsersList';
 import AddUser from './components/AddUser';
 import About from './components/About.jsx';
+import NavBar from './components/NavBar';
+import Form from './components/Form';
 import { Route, Switch} from 'react-router-dom';
 
 
@@ -14,6 +16,13 @@ class App extends Component {
 			users: [],
 			username: '',
 			email:'',
+			title: 'Testdriven.io',
+
+			formdata: {
+				username: '',
+				email:'',
+				password:'',
+			}
 		};
 
 		this.addUser = this.addUser.bind(this);
@@ -53,6 +62,8 @@ class App extends Component {
 
 	render() {
 	return (
+	<div>
+	<NavBar title={this.state.title}/>
 	<section className="section">
 		<div className="container">
 			<div className="columns">
@@ -77,11 +88,24 @@ class App extends Component {
 				</div>
 				)}/>
 				<Route exact path='/about' component={About}/>
+				<Route exact path='/register' render={() => (
+					<Form
+						formtype='Register'
+						formdata= {this.state.formdata}
+					/>
+				)}/>
+				<Route exact path='/register' render={() => (
+					<Form
+						formtype='Login'
+						formdata= {this.state.formdata}
+					/>
+				)}/>
 				</Switch>
 				</div>
 			</div>
 		</div>
 	</section>
+	</div>
 		)
 	}
 };
