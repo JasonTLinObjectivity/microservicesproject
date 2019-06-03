@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Logout snapshot renders properly 1`] = `
+<div>
+  <p>
+    You are now logged out. Click 
+    <a
+      href="/login"
+      onClick={[Function]}
+    >
+      Here
+    </a>
+     to log back in.
+  </p>
+</div>
+`;

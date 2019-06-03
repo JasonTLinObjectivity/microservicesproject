@@ -20,6 +20,6 @@ test('Logout snapshot renders properly', ()=>{
 	const tree = renderer.create(
 		<Router>
 		<Logout logoutUser={logoutUser}/>
-		<Router/>).toJSON();
+		</Router>).toJSON();
 	expect(tree).toMatchSnapshot();
 })
