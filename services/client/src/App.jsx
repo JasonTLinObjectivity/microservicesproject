@@ -5,6 +5,7 @@ import AddUser from './components/AddUser';
 import About from './components/About.jsx';
 import NavBar from './components/NavBar';
 import Form from './components/Form';
+import Logout from './components/Logout';
 import { Route, Switch} from 'react-router-dom';
 
 
@@ -22,11 +23,15 @@ class App extends Component {
 				username: '',
 				email:'',
 				password:'',
-			}
+			},
+			isAuthenticated: false,
 		};
 
 		this.addUser = this.addUser.bind(this);
 		this.handleChange = this.handleChange.bind(this);
+		this.handleFormChange = this.handleFormChange.bind(this);
+		this.handleUserFormSubmit = this.handleUserFormSubmit.bind(this);
+		this.logoutUser = this.logoutUser.bind(this);
 	}
 
 	componentDidMount(){
@@ -58,6 +63,54 @@ class App extends Component {
 		const obj = {};
 		obj[event.target.name] = event.target.value;
 		this.setState(obj);
+	}
+
+	handleFormChange(event) {
+		const obj = this.state.formdata;
+		obj[event.target.name] = event.target.value;
+		this.setState(obj);
+	}
+
+	handleUserFormSubmit(event) {
+		event.preventDefault();
+		const formType= window.location.href.split('/').reverse()[0];
+		let data = {
+			'email': this.state.formdata.email,
+			'password': this.state.formdata.password
+		}
+
+		if(formType === 'register') {
+			data.username = this.state.formdata.username;
+		}
+		const url = `${process.env.REACT_APP_USERS_SERVICE_URL}/auth/${formType}`;
+		axios.post(url, data)
+		.then((res) => {
+			this.clearFormState();
+			window.localStorage.setItem('authToken', res.data.auth_token);
+			this.setState({isAuthenticated: true,});
+			this.getUsers();
+		})
+		.catch((err) =>{
+			console.log(err);
+		})
+
+	}
+
+	clearFormState(event) {
+		this.setState({
+			formdata:{
+				username:'',
+				email:'',
+				password:'',
+			},
+			username:'',
+			email:''
+		});
+	}
+
+	logoutUser() {
+		window.localStorage.clear();
+		this.setState({ isAuthenticated: false});
 	}
 
 	render() {
@@ -92,12 +145,24 @@ class App extends Component {
 					<Form
 						formtype='Register'
 						formdata= {this.state.formdata}
+						handleFormChange = {this.handleFormChange}
+						handleUserFormSubmit= {this.handleUserFormSubmit}
+						isAuthenticated={this.state.isAuthenticated}
 					/>
 				)}/>
-				<Route exact path='/register' render={() => (
+				<Route exact path='/login' render={() => (
 					<Form
 						formtype='Login'
 						formdata= {this.state.formdata}
+						handleFormChange = {this.handleFormChange}
+						handleUserFormSubmit= {this.handleUserFormSubmit}
+						isAuthenticated={this.state.isAuthenticated}
+					/>
+				)}/>
+				<Route exact path='/logout' render={() => (
+					<Logout
+					logoutUser={this.logoutUser}
+					isAuthenticated={this.state.isAuthenticated}
 					/>
 				)}/>
 				</Switch>
