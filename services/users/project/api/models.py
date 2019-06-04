@@ -6,6 +6,7 @@ from flask import current_app
 import jwt
 import datetime
 
+
 class User(db.Model):
 
     __tablename__ = 'users'
@@ -15,20 +16,22 @@ class User(db.Model):
     email = db.Column(db.String(128), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     active = db.Column(db.Boolean(), default=True, nullable=False)
+    admin = db.Column(db.Boolean(), default=False, nullable=False)
     created_date = db.Column(db.DateTime, default=func.now(), nullable=False)
 
     def __init__(self, username, email, password):
         self.username = username
         self.email = email
-        self.password = bcrypt.generate_password_hash(password, current_app.config.get('BCRYPT_LOG_ROUNDS')).decode()
+        self.password = bcrypt.generate_password_hash(
+            password, current_app.config.get('BCRYPT_LOG_ROUNDS')).decode()
 
-        
     def to_json(self):
         return {
             'id': self.id,
             'username': self.username,
-            'email' : self.email,
-            'active' : self.active
+            'email': self.email,
+            'active': self.active,
+            'admin': self.admin
         }
 
     def encode_auth_token(self, user_id):
@@ -55,7 +58,7 @@ class User(db.Model):
                 auth_token,
                 current_app.config.get('SECRET_KEY'),
                 algorithm=['HS256']
-                )
+            )
             return payload['sub']
         except jwt.ExpiredSignatureError:
             return 'Signature expired. Please log in again'
