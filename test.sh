@@ -15,7 +15,7 @@ sudo -E docker-compose exec users python manage.py test
 inspect $? users
 sudo -E docker-compose exec users flake8 --ignore=E501 project
 inspect $? users-lint
-sudo -E docker-compose exec client npm test -- --coverage
+sudo -E docker-compose exec client npm test -- --coverage -u
 inspect $? client
 sudo -E docker-compose down
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import renderer from 'react-test-renderer';
 
-import Form from '../Form';
+import Form from '../forms/Form';
 
 const testdata = [
 {
@@ -35,6 +35,13 @@ testdata.forEach((el) => {
 	formdata={el.formdata} 
 	isAuthenticated={el.isAuthenticated}
 	/>
+
+	it(`${el.formtype} Form should be disabled by default`, ()=>{
+		const wrapper = shallow(component);
+		const input = wrapper.find('input[type="submit"]');
+		expect(input.get(0).props.disabled).toEqual(true);
+	});
+
 	it(`${el.formtype} renders properly`, () => {
 		const wrapper = shallow(component);
 		const h1 = wrapper.find('h1');
@@ -54,6 +61,7 @@ testdata.forEach((el) => {
 	it(`${el.formtype} submits form properly`, () =>{
 		const wrapper = shallow(component);
 		wrapper.instance().handleUserFormSubmit = jest.fn();
+		wrapper.instance().validateForm = jest.fn();
 		wrapper.update();
 		const input = wrapper.find('input[type="email"]');
 		expect(wrapper.instance().handleUserFormSubmit).toHaveBeenCalledTimes(0);
@@ -61,6 +69,7 @@ testdata.forEach((el) => {
 		wrapper.find('form').simulate('submit', el.formdata);
 		expect(wrapper.instance().handleUserFormSubmit).toHaveBeenCalledWith(el.formdata);
 		expect(wrapper.instance().handleUserFormSubmit).toHaveBeenCalledTimes(1);
+		expect(wrapper.instance().validateForm).toHaveBeenCalledTimes(1);
 	});
 });
 });

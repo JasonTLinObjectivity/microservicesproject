@@ -9,6 +9,22 @@ exports[`When not authenticated Login Snapshot renders properly 1`] = `
   </h1>
   <hr />
   <br />
+  <div>
+    <ul
+      className="validation-list"
+    >
+      <li
+        className="error"
+      >
+        Email is required.
+      </li>
+      <li
+        className="error"
+      >
+        Password is required.
+      </li>
+    </ul>
+  </div>
   <form
     onSubmit={[Function]}
   >
@@ -40,6 +56,7 @@ exports[`When not authenticated Login Snapshot renders properly 1`] = `
     </div>
     <input
       className="button is-primary is-medium is-fullwidth"
+      disabled={true}
       type="submit"
       value="Submit"
     />
@@ -56,6 +73,32 @@ exports[`When not authenticated Register Snapshot renders properly 1`] = `
   </h1>
   <hr />
   <br />
+  <div>
+    <ul
+      className="validation-list"
+    >
+      <li
+        className="error"
+      >
+        Username must be greater than 5 characters.
+      </li>
+      <li
+        className="error"
+      >
+        Email must be greater than 5 characters.
+      </li>
+      <li
+        className="error"
+      >
+        Email must be a valid email address.
+      </li>
+      <li
+        className="error"
+      >
+        Password must be greater than 10 characters.
+      </li>
+    </ul>
+  </div>
   <form
     onSubmit={[Function]}
   >
@@ -100,6 +143,7 @@ exports[`When not authenticated Register Snapshot renders properly 1`] = `
     </div>
     <input
       className="button is-primary is-medium is-fullwidth"
+      disabled={true}
       type="submit"
       value="Submit"
     />

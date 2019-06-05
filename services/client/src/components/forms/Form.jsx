@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import axios from 'axios'
 import { Redirect } from 'react-router-dom';
+import { registerFormRules, loginFormRules } from './form-rules.jsx';
+import FormErrors from './FormErrors.jsx';
 
 class Form extends Component{
 	constructor (props) {
@@ -10,7 +12,10 @@ class Form extends Component{
 				username:'',
 				email:'',
 				password:'',
-			}
+			},
+			valid:false,
+			registerFormRules: registerFormRules,
+			loginFormRules: loginFormRules,
 		}
 		this.handleFormChange = this.handleFormChange.bind(this);
 		this.handleUserFormSubmit = this.handleUserFormSubmit.bind(this);
@@ -18,12 +23,13 @@ class Form extends Component{
 
 	componentDidMount() {
 		this.clearForm();
-		console.log(this.state)
+		this.validateForm();
 	}
 
 	componentWillReceiveProps(nextProps) {
 		if(this.props.formType !== nextProps.formtype){
 			this.clearForm();
+			this.validateForm();
 		};
 	}
 
@@ -31,6 +37,7 @@ class Form extends Component{
 		const obj = this.state.formdata;
 		obj[event.target.name] = event.target.value;
 		this.setState(obj);
+		this.validateForm();
 	}
 
 	handleUserFormSubmit(event) {
@@ -53,7 +60,12 @@ class Form extends Component{
 			this.props.loginUser(res.data.auth_token);
 		})
 		.catch((err) =>{
-			console.log('Hi');
+			if(formType === 'Register'){
+				this.props.createMessage('That user already exists.', 'danger');
+			}
+			if(formType === 'Login'){
+				this.props.createMessage('User does not exist.', 'danger');
+			}
 		})
 
 	}
@@ -64,8 +76,65 @@ class Form extends Component{
 				username:'',
 				email:'',
 				password:'',
-			}
+			},
 		});
+	}
+
+	validateForm() {
+		const self = this;
+
+		const formdata = this.state.formdata;
+
+		self.resetRules();
+
+		let formRules = self.state.loginFormRules;
+
+		if(self.props.formtype === 'Register'){
+			formRules = self.state.registerFormRules;
+			if(formdata.username.length > 5) formRules[0].valid = true;
+			if(formdata.email.length > 5) formRules[1].valid = true;
+			if(self.validateEmail(formdata.email)) formRules[2].valid = true;
+			if(formdata.password.length > 10) formRules[3].valid = true;
+			self.setState({registerFormRules: formRules});
+			if(self.allTrue()) self.setState({valid:true});
+		}
+
+		if(self.props.formtype === 'Login') {
+			if(formdata.email.length > 0) formRules[0].valid = true;
+			if(formdata.password.length > 0) formRules[1].valid = true;
+			self.setState({loginFormRules: formRules})
+			if(self.allTrue()) self.setState({valid:true});
+		}
+	}
+
+	validateEmail(email) {
+		// eslint-disable-next-line
+		var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+		return re.test(email);
+	}
+
+	allTrue() {
+		let formRules = this.state.loginFormRules;
+		if(this.props.formtype === 'Register'){
+			formRules = this.state.registerFormRules;
+		}
+		for(const rule of formRules){
+			if(!rule.valid) return false;
+		}
+		return true;
+	}
+
+	resetRules(){
+		const registerFormRules = this.state.registerFormRules;
+		for(const rule of registerFormRules){
+			rule.valid = false;
+		}
+		this.setState({registerFormRules: registerFormRules});
+		for(const rule of loginFormRules){
+			rule.valid = false;
+		}
+		this.setState({loginFormRules: loginFormRules});
+		this.setState({valid: false});
 	}
 
 
@@ -73,8 +142,15 @@ class Form extends Component{
 	if (this.props.isAuthenticated) {
 		return(
 			<Redirect  to='/'/>	
-		)
+		);
+	};
+
+	let formRules = this.state.loginFormRules;
+
+	if(this.props.formtype === 'Register'){
+		formRules = this.state.registerFormRules;
 	}
+
 	return(
 	<div>
 	{
@@ -85,7 +161,12 @@ class Form extends Component{
 		this.props.formtype === 'Register' &&
 		<h1 className="title is-1">Register</h1>
 	}
+
 	<hr/><br/>
+	<FormErrors
+		formtype={this.props.formtype}
+		formRules={formRules}
+	/>
 	<form onSubmit={(event) => this.handleUserFormSubmit(event)}>
 	 {
 	 	this.props.formtype === 'Register' && 
@@ -127,6 +208,7 @@ class Form extends Component{
 			type="submit"
 			className="button is-primary is-medium is-fullwidth"
 			value="Submit"
+			disabled={!this.state.valid}
 		/>
 	</form>
 	</div>
