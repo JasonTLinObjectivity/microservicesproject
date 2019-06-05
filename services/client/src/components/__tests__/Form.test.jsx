@@ -13,8 +13,7 @@ const testdata = [
 		email: '',
 		password: '',
 	},
-	handleUserFormSubmit: jest.fn(),
-	handleFormChange: jest.fn(),
+	loginUser: jest.fn(),
 	isAuthenticated:false
 },
 {
@@ -24,8 +23,7 @@ const testdata = [
 		email:'',
 		password:'',
 	},
-	handleUserFormSubmit: jest.fn(),
-	handleFormChange: jest.fn(),
+	loginUser: jest.fn(),
 	isAuthenticated:false
 },
 ]
@@ -36,8 +34,6 @@ testdata.forEach((el) => {
 	formtype={el.formtype} 
 	formdata={el.formdata} 
 	isAuthenticated={el.isAuthenticated}
-	handleFormChange={el.handleFormChange}
-	handleUserFormSubmit={el.handleUserFormSubmit}
 	/>
 	it(`${el.formtype} renders properly`, () => {
 		const wrapper = shallow(component);
@@ -57,15 +53,14 @@ testdata.forEach((el) => {
 
 	it(`${el.formtype} submits form properly`, () =>{
 		const wrapper = shallow(component);
+		wrapper.instance().handleUserFormSubmit = jest.fn();
+		wrapper.update();
 		const input = wrapper.find('input[type="email"]');
-		expect(el.handleFormChange).toHaveBeenCalledTimes(0);
-		input.simulate('change');
-		expect(el.handleFormChange).toHaveBeenCalledTimes(1);
-
-		expect(el.handleUserFormSubmit).toHaveBeenCalledTimes(0);
+		expect(wrapper.instance().handleUserFormSubmit).toHaveBeenCalledTimes(0);
+		input.simulate('change', {target: {name: 'email', value: 'test@test.com'}});
 		wrapper.find('form').simulate('submit', el.formdata);
-		expect(el.handleUserFormSubmit).toHaveBeenCalledWith(el.formdata);
-		expect(el.handleUserFormSubmit).toHaveBeenCalledTimes(1);
+		expect(wrapper.instance().handleUserFormSubmit).toHaveBeenCalledWith(el.formdata);
+		expect(wrapper.instance().handleUserFormSubmit).toHaveBeenCalledTimes(1);
 	});
 });
 });

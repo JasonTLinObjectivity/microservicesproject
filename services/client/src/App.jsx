@@ -16,27 +16,22 @@ class App extends Component {
 
 		this.state = {
 			users: [],
-			username: '',
-			email:'',
 			title: 'Testdriven.io',
-
-			formdata: {
-				username: '',
-				email:'',
-				password:'',
-			},
 			isAuthenticated: false,
 		};
 
-		this.addUser = this.addUser.bind(this);
-		this.handleChange = this.handleChange.bind(this);
-		this.handleFormChange = this.handleFormChange.bind(this);
-		this.handleUserFormSubmit = this.handleUserFormSubmit.bind(this);
 		this.logoutUser = this.logoutUser.bind(this);
+		this.loginUser = this.loginUser.bind(this);
 	}
 
 	componentDidMount(){
 		this.getUsers();
+	}
+
+	componentWillMount(){
+		if(window.localStorage.getItem('authToken')){
+			this.setState({isAuthenticated: true})
+		}
 	}
 
 	getUsers() {
@@ -45,68 +40,10 @@ class App extends Component {
 		.catch((err) => {console.log(err);});
 	}
 
-	addUser(event) {
-		event.preventDefault();
-		const data = {
-			'username': this.state.username,
-			'email': this.state.email
-		}
-
-		axios.post(`${process.env.REACT_APP_USERS_SERVICE_URL}/users`, data)
-		.then((res) => {
-			this.getUsers();
-			this.setState({'username':'', 'email':''});
-		})
-		.catch((err) =>{console.log(err);});
-	}
-
-	handleChange(event) {
-		const obj = {};
-		obj[event.target.name] = event.target.value;
-		this.setState(obj);
-	}
-
-	handleFormChange(event) {
-		const obj = this.state.formdata;
-		obj[event.target.name] = event.target.value;
-		this.setState(obj);
-	}
-
-	handleUserFormSubmit(event) {
-		event.preventDefault();
-		const formType= window.location.href.split('/').reverse()[0];
-		let data = {
-			'email': this.state.formdata.email,
-			'password': this.state.formdata.password
-		}
-
-		if(formType === 'register') {
-			data.username = this.state.formdata.username;
-		}
-		const url = `${process.env.REACT_APP_USERS_SERVICE_URL}/auth/${formType}`;
-		axios.post(url, data)
-		.then((res) => {
-			this.clearFormState();
-			window.localStorage.setItem('authToken', res.data.auth_token);
-			this.setState({isAuthenticated: true,});
-			this.getUsers();
-		})
-		.catch((err) =>{
-			console.log(err);
-		})
-
-	}
-
-	clearFormState(event) {
-		this.setState({
-			formdata:{
-				username:'',
-				email:'',
-				password:'',
-			},
-			username:'',
-			email:''
-		});
+	loginUser(token) {
+		window.localStorage.setItem('authToken', token);
+		this.setState({ isAuthenticated: true});
+		this.getUsers();
 	}
 
 	logoutUser() {
@@ -130,26 +67,23 @@ class App extends Component {
 				<Route exact path='/about' component={About}/>
 				<Route exact path='/register' render={() => (
 					<Form
-						formtype='Register'
-						formdata= {this.state.formdata}
-						handleFormChange = {this.handleFormChange}
-						handleUserFormSubmit= {this.handleUserFormSubmit}
+						formtype={'Register'}
 						isAuthenticated={this.state.isAuthenticated}
+						loginUser={this.loginUser}
 					/>
 				)}/>
 				<Route exact path='/login' render={() => (
 					<Form
-						formtype='Login'
-						formdata= {this.state.formdata}
-						handleFormChange = {this.handleFormChange}
-						handleUserFormSubmit= {this.handleUserFormSubmit}
+						formtype={'Login'}
 						isAuthenticated={this.state.isAuthenticated}
+						loginUser={this.loginUser}
 					/>
 				)}/>
 				<Route exact path='/logout' render={() => (
 					<Logout
 					logoutUser={this.logoutUser}
 					isAuthenticated={this.state.isAuthenticated}
+					loginUser={this.loginUser}
 					/>
 				)}/>
 				<Route exact path='/status' render={() => (

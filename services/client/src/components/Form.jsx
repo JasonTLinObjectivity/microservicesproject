@@ -1,8 +1,76 @@
-import React from 'react';
+import React, { Component } from 'react';
+import axios from 'axios'
 import { Redirect } from 'react-router-dom';
 
-const Form = (props) => {
-	if (props.isAuthenticated) {
+class Form extends Component{
+	constructor (props) {
+		super(props);
+		this.state = {
+			formdata: {
+				username:'',
+				email:'',
+				password:'',
+			}
+		}
+		this.handleFormChange = this.handleFormChange.bind(this);
+		this.handleUserFormSubmit = this.handleUserFormSubmit.bind(this);
+	}
+
+	componentDidMount() {
+		this.clearForm();
+		console.log(this.state)
+	}
+
+	componentWillReceiveProps(nextProps) {
+		if(this.props.formType !== nextProps.formtype){
+			this.clearForm();
+		};
+	}
+
+	handleFormChange(event) {
+		const obj = this.state.formdata;
+		obj[event.target.name] = event.target.value;
+		this.setState(obj);
+	}
+
+	handleUserFormSubmit(event) {
+		event.preventDefault();
+		const formType= this.props.formtype;
+		const data = {
+			'email': this.state.formdata.email,
+			'password': this.state.formdata.password
+		}
+
+		if(formType === 'Register') {
+			data.username = this.state.formdata.username;
+		}
+		const url = `${process.env.REACT_APP_USERS_SERVICE_URL}/auth/${formType.toLowerCase()}`;
+		axios.post(url, data)
+		.then((res) => {
+			this.clearForm();
+			window.localStorage.setItem('authToken', res.data.auth_token);
+			this.setState({isAuthenticated: true,});
+			this.props.loginUser(res.data.auth_token);
+		})
+		.catch((err) =>{
+			console.log('Hi');
+		})
+
+	}
+
+	clearForm() {
+		this.setState({
+			formdata:{
+				username:'',
+				email:'',
+				password:'',
+			}
+		});
+	}
+
+
+	render() {
+	if (this.props.isAuthenticated) {
 		return(
 			<Redirect  to='/'/>	
 		)
@@ -10,17 +78,17 @@ const Form = (props) => {
 	return(
 	<div>
 	{
-		props.formtype === 'Login' &&
+		this.props.formtype === 'Login' &&
 		<h1 className="title is-1">Log In</h1>
 	}
 	{
-		props.formtype === 'Register' &&
+		this.props.formtype === 'Register' &&
 		<h1 className="title is-1">Register</h1>
 	}
 	<hr/><br/>
-	<form onSubmit={(event) => props.handleUserFormSubmit(event)}>
+	<form onSubmit={(event) => this.handleUserFormSubmit(event)}>
 	 {
-	 	props.formtype === 'Register' && 
+	 	this.props.formtype === 'Register' && 
 	 	<div className="field">
 	 		<input
 	 			name="username"
@@ -28,8 +96,8 @@ const Form = (props) => {
 	 			type="text"
 	 			placeholder="Enter a username"
 	 			required
-	 			value={props.formdata.username}
-	 			onChange={props.handleFormChange}
+	 			value={this.state.formdata.username}
+	 			onChange={this.handleFormChange}
 	 		/>
 	 	</div>
 	}
@@ -40,8 +108,8 @@ const Form = (props) => {
 			type="email"
 			placeholder="Enter an email address"
 			required
-			value={props.formdata.email}
-			onChange={props.handleFormChange}
+			value={this.state.formdata.email}
+			onChange={this.handleFormChange}
 		/>
 	</div>
 	<div className="field">
@@ -51,8 +119,8 @@ const Form = (props) => {
 			type="password"
 			placeholder="Enter a password"
 			required
-			value={props.formdata.password}
-			onChange={props.handleFormChange}
+			value={this.state.formdata.password}
+			onChange={this.handleFormChange}
 		/>
 	</div>
 		<input
@@ -62,7 +130,9 @@ const Form = (props) => {
 		/>
 	</form>
 	</div>
-)};
+)}
+
+};
 
 
 export default Form;
