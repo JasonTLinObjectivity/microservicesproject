@@ -44,11 +44,10 @@ describe('Message', ()=>{
 		cy.contains('Log Out').click();
 
 		cy
-		.contains('Log In').click()
-		.get('input[name="email"]').clear().type(email)
-		.get('input[name="password"]').clear().type(password)
-		.get('input[type="submit"]').click()
-		.wait(100);
+		.visit('/login')
+		.get('input[name="email"]').type(email)
+		.get('input[name="password"]').type(password)
+		.get('input[type="submit"]').click();
 
 		cy
 		.get('.notification.is-success').contains('Welcome!')

@@ -52,14 +52,37 @@ class Form extends Component{
 			data.username = this.state.formdata.username;
 		}
 		const url = `${process.env.REACT_APP_USERS_SERVICE_URL}/auth/${formType.toLowerCase()}`;
-		axios.post(url, data)
+		/*axios.post(url, data)
 		.then((res) => {
+			console.log(res);
+			console.log(res.data);
+			this.clearForm();
+			window.localStorage.setItem('authToken', res.data.auth_token);
+			this.setState({isAuthenticated: true,});
+			this.props.loginUser(res.data.auth_token);
+
+		})
+		.catch((err) =>{
+			console.log(err.message);
+			if(formType === 'Register'){
+				this.props.createMessage('That user already exists.', 'danger');
+			}
+			if(formType === 'Login'){
+				this.props.createMessage('User does not exist.', 'danger');
+			}
+		})*/
+
+		axios.post(`/auth/${formType.toLowerCase()}`, data)
+		.then((res)=>{
+			console.log(res);
+			console.log(res.data);
 			this.clearForm();
 			window.localStorage.setItem('authToken', res.data.auth_token);
 			this.setState({isAuthenticated: true,});
 			this.props.loginUser(res.data.auth_token);
 		})
-		.catch((err) =>{
+		.catch((err)=>{
+			console.log(err.message);
 			if(formType === 'Register'){
 				this.props.createMessage('That user already exists.', 'danger');
 			}

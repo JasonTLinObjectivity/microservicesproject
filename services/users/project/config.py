@@ -14,6 +14,10 @@ class BaseConfig:
     TOKEN_EXPIRATION_DAYS = 30
     TOKEN_EXPIRATION_SECONDS = 0
 
+class StagingConfig:
+    """Staging Configuration"""
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
+
 
 class DevelopmentConfig(BaseConfig):
     """Development Configuration"""

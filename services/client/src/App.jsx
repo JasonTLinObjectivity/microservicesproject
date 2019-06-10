@@ -7,6 +7,8 @@ import NavBar from './components/NavBar';
 import Form from './components/forms/Form';
 import Logout from './components/Logout';
 import UserStatus from './components/UserStatus';
+import Footer from './components/Footer';
+import Exercises from './components/Exercises';
 import { Route, Switch} from 'react-router-dom';
 import Message from './components/Message';
 
@@ -95,7 +97,12 @@ class App extends Component {
 				<br/>
 				<Switch>
 				<Route exact path='/' render = {() => (
-				 <UsersList users={this.state.users}/>
+				 <Exercises
+				 isAuthenticated={this.state.isAuthenticated}
+				 />
+				)}/>
+				<Route exact path='/all-users' render = {()=> (
+					<UsersList users={this.state.users}/>
 				)}/>
 				<Route exact path='/about' component={About}/>
 				<Route exact path='/register' render={() => (
@@ -129,6 +136,7 @@ class App extends Component {
 			</div>
 		</div>
 	</section>
+	<Footer/>
 	</div>
 		)
 	}

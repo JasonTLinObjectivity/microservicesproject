@@ -84,7 +84,7 @@ class UsersList(Resource):
                 return response_object, 400
         except (exc.IntegrityError, ValueError):
             db.session.rollback()
-            return response_object, 400
+            return response_object, 40
 
     def get(self):
         """Get all users"""

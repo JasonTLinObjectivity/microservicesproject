@@ -2,6 +2,8 @@ import React from 'react';
 import { shallow, mount } from 'enzyme';
 import App from '../../App'
 import { MemoryRouter as Router} from 'react-router-dom';
+import AceEditor from 'react-ace';
+jest.mock('react-ace');
 
 beforeAll(()=>{
 	global.localStrong = {

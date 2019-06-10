@@ -37,13 +37,7 @@ describe('Login', ()=>{
 		.get('input[type="submit"]').click()
 
 		cy.wait(2000);
-		
-
-		cy.contains('All Users');
-		cy
-		.get('table')
-		.find('tbody > tr').last()
-		.find('td').contains(username);
+	
 
 		cy.get('.notification.is-success').contains('Welcome!');
 		cy.get('.navbar-burger').click();
@@ -66,7 +60,6 @@ describe('Login', ()=>{
 		.get('input[name="password"]').type(password)
 		.get('input[type="submit"]').click();
 
-		cy.contains('All Users').should('not.be.visible');
 		cy.contains('Log In');
 
 		cy.get('.navbar-burger').click();
@@ -85,7 +78,6 @@ describe('Login', ()=>{
 		.get('input[type="submit"]').click();
 
 
-		cy.contains('All Users').should('not.be.visible');
 		cy.contains('Log In');
 
 		cy.get('.navbar-burger').click();
